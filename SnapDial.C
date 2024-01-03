@@ -10,7 +10,7 @@ sbit EC_KEY = P3 ^ 4;
 
 // #define Fullspeed
 #define THIS_ENDP0_SIZE DEFAULT_ENDP0_SIZE
-#define ENDP1_IN_SIZE 4
+#define ENDP1_IN_SIZE 16
 
 // 端点0 OUT&IN缓冲区，必须是偶地址
 UINT8X Ep0Buffer[MIN(64, THIS_ENDP0_SIZE + 2)] _at_ 0x0000;
@@ -18,7 +18,7 @@ UINT8X Ep0Buffer[MIN(64, THIS_ENDP0_SIZE + 2)] _at_ 0x0000;
 UINT8X Ep1Buffer[MIN(64, ENDP1_IN_SIZE + 2)] _at_ MIN(64, THIS_ENDP0_SIZE + 2);
 
 /*鼠标数据*/
-UINT8 HIDDial[4] = {0x0, 0x0, 0x0, 0x0};
+UINT8 HIDDial[5] = {0x01, 0x0, 0x0, 0x0, 0x0};
 
 UINT16 SetupLen;
 UINT8 SetupReq, Ready, Count, FLAG_EP1, UsbConfig;
@@ -469,28 +469,28 @@ main()
         if (Ready)
         {
             // Enp1IntIn(); // 仅发送键盘键值“抬起”操作
-            //if (EC_KEY == 0)
+            // if (EC_KEY == 0)
             {
                 FLAG_EP1 = 0;
-                HIDDial[0] = 0x01;
+                HIDDial[1] = 0x01;
                 Enp1IntIn();
                 while (FLAG_EP1 == 0)
                 {
                     ; /*等待上一包传输完成*/
                 }
             }
-						mDelaymS(10); // 模拟单片机做其它事
-            //else
+            mDelaymS(10000); // 模拟单片机做其它事
+            // else
             {
                 FLAG_EP1 = 0;
-                HIDDial[0] = 0x00;
+                HIDDial[1] = 0x00;
                 Enp1IntIn();
                 while (FLAG_EP1 == 0)
                 {
                     ; /*等待上一包传输完成*/
                 }
             }
-						mDelaymS(1000); // 模拟单片机做其它事
+            mDelaymS(1000); // 模拟单片机做其它事
         }
     }
 }
