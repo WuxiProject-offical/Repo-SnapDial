@@ -1,18 +1,18 @@
 
 /********************************** (C) COPYRIGHT *******************************
-* File Name          : GPIO.C
-* Author             : WCH
-* Version            : V1.0
-* Date               : 2017/01/20
-* Description        : CH552 IO 设置接口函数和GPIO中断函数  
-*******************************************************************************/
+ * File Name          : GPIO.C
+ * Author             : WCH
+ * Version            : V1.0
+ * Date               : 2017/01/20
+ * Description        : CH552 IO 设置接口函数和GPIO中断函数
+ *******************************************************************************/
 
-#include "../Lib/CH552.H"                                                          
+#include "../Lib/CH552.H"
 #include "../Lib/Debug.H"
 #include "../Lib/GPIO.H"
 #include "stdio.h"
 
-#pragma  NOAREGS
+#pragma NOAREGS
 
 /*******************************************************************************
 * Function Name  : Port1Cfg()
@@ -20,32 +20,33 @@
 * Input          : Mode  0 = 浮空输入，无上拉
                          1 = 推挽输入输出
                          2 = 开漏输入输出，无上拉
-                         3 = 类51模式，开漏输入输出，有上拉，内部电路可以加速由低到高的电平爬升		
-                   ,UINT8 Pin	(0-7)											 
+                         3 = 类51模式，开漏输入输出，有上拉，内部电路可以加速由低到高的电平爬升
+                   ,UINT8 Pin	(0-7)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void Port1Cfg(UINT8 Mode,UINT8 Pin)
+void Port1Cfg(UINT8 Mode, UINT8 Pin)
 {
-  switch(Mode){
-    case 0:
-      P1_MOD_OC = P1_MOD_OC & ~(1<<Pin);
-      P1_DIR_PU = P1_DIR_PU &	~(1<<Pin);	
-      break;
-    case 1:
-      P1_MOD_OC = P1_MOD_OC & ~(1<<Pin);
-      P1_DIR_PU = P1_DIR_PU |	(1<<Pin);				
-      break;		
-    case 2:
-      P1_MOD_OC = P1_MOD_OC | (1<<Pin);
-      P1_DIR_PU = P1_DIR_PU &	~(1<<Pin);				
-      break;		
-    case 3:
-      P1_MOD_OC = P1_MOD_OC | (1<<Pin);
-      P1_DIR_PU = P1_DIR_PU |	(1<<Pin);			
-      break;
-    default:
-      break;			
+  switch (Mode)
+  {
+  case 0:
+    P1_MOD_OC = P1_MOD_OC & ~(1 << Pin);
+    P1_DIR_PU = P1_DIR_PU & ~(1 << Pin);
+    break;
+  case 1:
+    P1_MOD_OC = P1_MOD_OC & ~(1 << Pin);
+    P1_DIR_PU = P1_DIR_PU | (1 << Pin);
+    break;
+  case 2:
+    P1_MOD_OC = P1_MOD_OC | (1 << Pin);
+    P1_DIR_PU = P1_DIR_PU & ~(1 << Pin);
+    break;
+  case 3:
+    P1_MOD_OC = P1_MOD_OC | (1 << Pin);
+    P1_DIR_PU = P1_DIR_PU | (1 << Pin);
+    break;
+  default:
+    break;
   }
 }
 
@@ -55,64 +56,64 @@ void Port1Cfg(UINT8 Mode,UINT8 Pin)
 * Input          : Mode  0 = 浮空输入，无上拉
                          1 = 推挽输入输出
                          2 = 开漏输入输出，无上拉
-                         3 = 类51模式，开漏输入输出，有上拉，内部电路可以加速由低到高的电平爬升		
-                   ,UINT8 Pin	(0-7)											 
+                         3 = 类51模式，开漏输入输出，有上拉，内部电路可以加速由低到高的电平爬升
+                   ,UINT8 Pin	(0-7)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void Port3Cfg(UINT8 Mode,UINT8 Pin)
+void Port3Cfg(UINT8 Mode, UINT8 Pin)
 {
-  switch(Mode){
-    case 0:
-      P3_MOD_OC = P3_MOD_OC & ~(1<<Pin);
-      P3_DIR_PU = P3_DIR_PU &	~(1<<Pin);	
-      break;
-    case 1:
-      P3_MOD_OC = P3_MOD_OC & ~(1<<Pin);
-      P3_DIR_PU = P3_DIR_PU |	(1<<Pin);				
-      break;		
-    case 2:
-      P3_MOD_OC = P3_MOD_OC | (1<<Pin);
-      P3_DIR_PU = P3_DIR_PU &	~(1<<Pin);				
-      break;		
-    case 3:
-      P3_MOD_OC = P3_MOD_OC | (1<<Pin);
-      P3_DIR_PU = P3_DIR_PU |	(1<<Pin);			
-      break;
-    default:
-      break;			
+  switch (Mode)
+  {
+  case 0:
+    P3_MOD_OC = P3_MOD_OC & ~(1 << Pin);
+    P3_DIR_PU = P3_DIR_PU & ~(1 << Pin);
+    break;
+  case 1:
+    P3_MOD_OC = P3_MOD_OC & ~(1 << Pin);
+    P3_DIR_PU = P3_DIR_PU | (1 << Pin);
+    break;
+  case 2:
+    P3_MOD_OC = P3_MOD_OC | (1 << Pin);
+    P3_DIR_PU = P3_DIR_PU & ~(1 << Pin);
+    break;
+  case 3:
+    P3_MOD_OC = P3_MOD_OC | (1 << Pin);
+    P3_DIR_PU = P3_DIR_PU | (1 << Pin);
+    break;
+  default:
+    break;
   }
 }
 
-/*******************************************************************************
-* Function Name  : GPIOInterruptCfg()
-* Description    : GPIO中断配置
-* Input          : None									 
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void GPIOInterruptCfg()
+void EC_Cfg()
 {
-   GPIO_IE &= ~bIE_IO_EDGE;                                                    //高/低电平触发
-//    GPIO_IE |= bIE_IO_EDGE;                                                  //上升/下降触发  
-//    GPIO_IE |= bIE_RXD1_LO;                                                     //RXD1低电平或下降沿触发
-   GPIO_IE |= bIE_P1_5_LO | bIE_P1_4_LO | bIE_P1_3_LO | bIE_RST_HI;            
-   //P15\P14\P13低电平触发；RST高电平触发
-//    GPIO_IE |= bIE_P3_1_LO;                                                     //P31低电平或下降沿触发
-//    GPIO_IE |= bIE_RXD0_LO;                                                     //RXD0低电平或下降沿触发	
-   IE_GPIO  = 1;                                                               //GPIO中断开启
+  // INT off
+  EX0 = 0;
+  EX1 = 0;
+  // Init gpios
+  Port3Cfg(0, 4); // P3.4 EC_KEY
+  Port3Cfg(0, 2); // P3.2 EC_A
+  Port3Cfg(0, 3); // P3.3 EC_B
+  // Init ints
+  IT0 = 1; // FALLEDGE trig
+  IT1 = 1;
+  // INT on
+  EX0 = 1;
+  EX1 = 1;
 }
 
-#ifdef GPIO_INTERRUPT
-/*******************************************************************************
-* Function Name  : GPIOInterrupt(void)
-* Description    : GPIO 中断服务程序
-*******************************************************************************/
-void	GPIOInterrupt( void ) interrupt INT_NO_GPIO  using 1                      //GPIO中断服务程序,使用寄存器组1
-{ 
-#ifdef DE_PRINTF
-      printf("GPIO_STATUS: %02x\n",(UINT16)(PIN_FUNC&bIO_INT_ACT));             
-#endif
+void EC_IntA(void) interrupt INT_NO_INT0 using 2 // INT0中断服务程序,使用寄存器组2
+{
+  ;
 }
-#endif
 
+void EC_IntB(void) interrupt INT_NO_INT1 using 2 // INT0中断服务程序,使用寄存器组2
+{
+  ;
+}
+
+short EC_Read()
+{
+  return 0;
+}

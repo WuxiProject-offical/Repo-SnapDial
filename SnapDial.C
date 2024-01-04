@@ -8,7 +8,6 @@ sbit EC_A = P3 ^ 2;
 sbit EC_B = P3 ^ 3;
 sbit EC_KEY = P3 ^ 4;
 
-// #define Fullspeed
 #define THIS_ENDP0_SIZE DEFAULT_ENDP0_SIZE
 #define ENDP1_IN_SIZE 16
 
@@ -17,8 +16,9 @@ UINT8X Ep0Buffer[MIN(64, THIS_ENDP0_SIZE + 2)] _at_ 0x0000;
 // 端点1 IN缓冲区,必须是偶地址
 UINT8X Ep1Buffer[MIN(64, ENDP1_IN_SIZE + 2)] _at_ MIN(64, THIS_ENDP0_SIZE + 2);
 
-/*鼠标数据*/
-UINT8 HIDDial[5] = {0x01, 0x0, 0x0, 0x0, 0x0};
+/*旋钮数据*/
+UINT8 HIDDial[6] = {0x01, 0x0, 0x0, 0x0, 0x0, 0x0};
+short DialRotation = 0;
 
 UINT16 SetupLen;
 UINT8 SetupReq, Ready, Count, FLAG_EP1, UsbConfig;
@@ -86,6 +86,7 @@ void USBDeviceInit()
     UDEV_CTRL |= bUD_PORT_EN;                              // 允许USB端口
     USB_INT_FG = 0xFF;                                     // 清中断标志
     USB_INT_EN = bUIE_SUSPEND | bUIE_TRANSFER | bUIE_BUS_RST;
+    IP_EX |= bIP_USB; // USB使用高级中断
     IE_USB = 1;
 }
 
@@ -454,43 +455,30 @@ main()
     CfgFsys();
     mDelaymS(5); // 修改主频等待内部晶振稳定,必加
 
-    Port3Cfg(0, 4); // P3.4 EC_KEY
-    Port3Cfg(0, 2); // P3.2 EC_A
-    Port3Cfg(0, 3); // P3.3 EC_B
+    EC_Cfg();
 
-    USBDeviceReset();
-    // USBDeviceInit(); // USB设备模式初始化
-    EA = 1;         // 允许单片机中断
-    UEP1_T_LEN = 0; // 预使用发送长度一定要清空
+    // USBDeviceReset();
+    USBDeviceInit(); // USB设备模式初始化
+    EA = 1;          // 允许单片机中断
+    UEP1_T_LEN = 0;  // 预使用发送长度一定要清空
     FLAG_EP1 = 0;
     Ready = 0;
     while (1)
     {
         if (Ready)
         {
-            // Enp1IntIn(); // 仅发送键盘键值“抬起”操作
-            // if (EC_KEY == 0)
+            FLAG_EP1 = 0;
+            HIDDial[1] = (EC_KEY) ? 0x00 : 0x01;
+            DialRotation = EC_Read();
+            HIDDial[2] = DialRotation & 0x00ff;
+            HIDDial[3] = ((DialRotation & 0xff00) >> 8);
+            Enp1IntIn();
+            while (FLAG_EP1 == 0)
             {
-                FLAG_EP1 = 0;
-                HIDDial[1] = 0x01;
-                Enp1IntIn();
-                while (FLAG_EP1 == 0)
-                {
-                    ; /*等待上一包传输完成*/
-                }
+                ; /*等待上一包传输完成*/
             }
-            mDelaymS(10000); // 模拟单片机做其它事
-            // else
-            {
-                FLAG_EP1 = 0;
-                HIDDial[1] = 0x00;
-                Enp1IntIn();
-                while (FLAG_EP1 == 0)
-                {
-                    ; /*等待上一包传输完成*/
-                }
-            }
-            mDelaymS(1000); // 模拟单片机做其它事
+
+            mDelaymS(10); // 模拟单片机做其它事
         }
     }
 }

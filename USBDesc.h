@@ -49,7 +49,7 @@ UINT8C CfgDesc[] =
         0x00,       // 国家代码
         0x01,       // 下挂HID描述符数量
         0x22,       // 下挂描述符1类型（是报表描述符）
-        78, 0x00,   // 下挂描述符1长度
+        89, 0x00,   // 下挂描述符1长度
 
         // 端点描述符
         0x07,                // 描述符大小
@@ -57,7 +57,7 @@ UINT8C CfgDesc[] =
         0x81,                // 是EP1IN
         0x03,                // 是中断传输
         ENDP1_IN_SIZE, 0x00, // 端点大小
-        0x01                 // 上报间隔1ms
+        0x0a                 // 上报间隔10ms
 };
 
 /*字符串描述符*/
@@ -110,11 +110,14 @@ UINT8C HIDRepDesc[] =
         0x15, 0x00, //     LOGICAL_MINIMUM (0)
         0x25, 0x01, //     LOGICAL_MAXIMUM (1)
         0x81, 0x02, //     INPUT (Data,Var,Abs)
+        0x95, 0x01, //     REPORT_COUNT (1)
+        0x75, 0x07, //     REPORT_SIZE (7)
+        0x81, 0x03, //     INPUT (Cnst,Var,Abs)
 
         0x05, 0x01,       //     USAGE_PAGE (Generic Desktop)
         0x09, 0x37,       //     USAGE (Dial)
         0x95, 0x01,       //     REPORT_COUNT (1)
-        0x75, 0x0f,       //     REPORT_SIZE (15)
+        0x75, 0x10,       //     REPORT_SIZE (16)
         0x55, 0x0f,       //     UNIT_EXPONENT (-1)
         0x65, 0x14,       //     UNIT (Degrees, English Rotation)
         0x36, 0xf0, 0xf1, //     PHYSICAL_MINIMUM (-3600)
@@ -137,7 +140,11 @@ UINT8C HIDRepDesc[] =
         0x81, 0x42, //     INPUT (Data,Var,Abs,Null)
 
         0xc0, //   END_COLLECTION
-        0xc0  // END_COLLECTION
+        0xc0, // END_COLLECTION
+
+        0x09, 0x80, // Usage (System Control)
+        0xa1, 0x01, // Collection (Application)
+        0xc0        // End Collection
 };
 
 #endif
