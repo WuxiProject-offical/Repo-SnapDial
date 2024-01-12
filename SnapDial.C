@@ -4,10 +4,6 @@
 #include <string.h>
 #include <stdio.h>
 
-sbit EC_A = P3 ^ 2;
-sbit EC_B = P3 ^ 3;
-sbit EC_KEY = P3 ^ 4;
-
 #define THIS_ENDP0_SIZE DEFAULT_ENDP0_SIZE
 #define ENDP1_IN_SIZE 16
 
@@ -455,6 +451,10 @@ main()
     CfgFsys();
     mDelaymS(5); // 修改主频等待内部晶振稳定,必加
 
+    Port1Cfg(3, 4);
+    Port1Cfg(3, 5);
+    LEDA = 1;
+    LEDB = 1;
     EC_Cfg();
 
     // USBDeviceReset();
@@ -469,7 +469,7 @@ main()
         {
             FLAG_EP1 = 0;
             HIDDial[1] = (EC_KEY) ? 0x00 : 0x01;
-            DialRotation = EC_Read();
+            DialRotation = EC_Read()*50;
             HIDDial[2] = DialRotation & 0x00ff;
             HIDDial[3] = ((DialRotation & 0xff00) >> 8);
             Enp1IntIn();

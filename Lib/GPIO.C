@@ -91,29 +91,102 @@ void EC_Cfg()
   // INT off
   EX0 = 0;
   EX1 = 0;
-  // Init gpios
+  //  Init gpios
   Port3Cfg(0, 4); // P3.4 EC_KEY
   Port3Cfg(0, 2); // P3.2 EC_A
   Port3Cfg(0, 3); // P3.3 EC_B
   // Init ints
   IT0 = 1; // FALLEDGE trig
   IT1 = 1;
-  // INT on
+  //  INT on
   EX0 = 1;
   EX1 = 1;
 }
 
+volatile short data ec_count = 0;
+volatile bit data ec_rotating = 0;
+
 void EC_IntA(void) interrupt INT_NO_INT0 using 2 // INT0中断服务程序,使用寄存器组2
 {
-  ;
+  if (ec_rotating)
+  {
+    // A相后动
+    if (EC_B == 1)
+    {
+      // 不合理的，丢步了
+      // LEDA = 1;
+      // LEDB = 1;
+    }
+    else
+    {
+      // 方向1转完了
+      ec_count++;
+      // LEDA = 1;
+    }
+    ec_rotating = 0;
+  }
+  else
+  {
+    // A相先动
+    if (EC_B == 1)
+    {
+      // 方向1起转
+      ec_rotating = 1;
+      // LEDA = 0;
+    }
+    else
+    {
+      // 不合理的，丢步了
+      ec_rotating = 0;
+      // LEDA = 1;
+      // LEDB = 1;
+    }
+  }
 }
 
-void EC_IntB(void) interrupt INT_NO_INT1 using 2 // INT0中断服务程序,使用寄存器组2
+void EC_IntB(void) interrupt INT_NO_INT1 using 3 // INT1中断服务程序,使用寄存器组2
 {
-  ;
+  if (ec_rotating)
+  {
+    // B相后动
+    if (EC_A == 1)
+    {
+      // 不合理的，丢步了
+      // LEDA = 1;
+      // LEDB = 1;
+    }
+    else
+    {
+      // 方向2转完了
+      ec_count--;
+      // LEDB = 1;
+    }
+    ec_rotating = 0;
+  }
+  else
+  {
+    // B相先动
+    if (EC_A == 1)
+    {
+      // 方向2起转
+      ec_rotating = 1;
+      // LEDB = 0;
+    }
+    else
+    {
+      // 不合理的，丢步了
+      ec_rotating = 0;
+      // LEDA = 1;
+      // LEDB = 1;
+    }
+  }
 }
 
 short EC_Read()
 {
-  return 0;
+
+  short cnt = ec_count;
+  // if (!ec_rotating)
+  ec_count = 0;
+  return cnt;
 }

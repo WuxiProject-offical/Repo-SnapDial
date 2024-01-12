@@ -15,5 +15,12 @@
 void Port1Cfg(UINT8 Mode, UINT8 Pin);
 void Port3Cfg(UINT8 Mode, UINT8 Pin);
 
+sbit EC_A = P3 ^ 2;
+sbit EC_B = P3 ^ 3;
+sbit EC_KEY = P3 ^ 4;
+
+sbit LEDA = P1 ^ 4;
+sbit LEDB = P1 ^ 5;
+
 void EC_Cfg();
 short EC_Read();
