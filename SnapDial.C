@@ -423,29 +423,6 @@ void DeviceInterrupt(void) interrupt INT_NO_USB using 1 // USBÖĞ¶Ï·şÎñ³ÌĞò,Ê¹ÓÃ¼
     }
 }
 
-void HIDValueHandle()
-{
-    UINT8 i = 0;
-    printf("%c", (UINT8)i);
-    switch (i)
-    {
-    case 'Q': // Num Lock¼ü
-        FLAG_EP1 = 0;
-        // HIDKey[2] = 0x39;
-        Enp1IntIn();
-        // HIDKey[2] = 0; // °´¼ü½áÊø
-        while (FLAG_EP1 == 0)
-        {
-            ; /*µÈ´ıÉÏÒ»°ü´«ÊäÍê³É*/
-        }
-        Enp1IntIn();
-        break;
-    default:                                                     // ÆäËû
-        UEP1_CTRL = UEP1_CTRL & ~MASK_UEP_T_RES | UEP_T_RES_NAK; // Ä¬ÈÏÓ¦´ğNAK
-        break;
-    }
-}
-
 main()
 {
     CfgFsys();
@@ -478,7 +455,7 @@ main()
                 ; /*µÈ´ıÉÏÒ»°ü´«ÊäÍê³É*/
             }
 
-            mDelaymS(10); // Ä£Äâµ¥Æ¬»ú×öÆäËüÊÂ
+            mDelaymS(50); // Ä£Äâµ¥Æ¬»ú×öÆäËüÊÂ
         }
     }
 }
